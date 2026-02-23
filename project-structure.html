@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>E-FARM — Project Structure</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg:#0c1410; --surface:#111e16; --card:#162118;
+    --green:#6fcf97; --yellow:#f2c94c; --blue:#56ccf2;
+    --red:#eb5757; --purple:#bb87fc;
+    --text:#e8f5e4; --muted:#7a9e84; --border:rgba(111,207,151,0.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;line-height:1.6;padding:40px 24px;}
+  
+  .wrap{max-width:1200px;margin:0 auto;}
+
+  /* HEADER */
+  .header{text-align:center;padding:48px 0 40px;border-bottom:1px solid var(--border);margin-bottom:48px;}
+  .header h1{font-size:48px;font-weight:800;color:var(--green);letter-spacing:3px;}
+  .header p{color:var(--muted);font-size:14px;font-family:'JetBrains Mono',monospace;letter-spacing:2px;margin-top:8px;}
+  .stack-badges{display:flex;justify-content:center;gap:10px;margin-top:20px;flex-wrap:wrap;}
+  .badge{padding:5px 14px;border-radius:20px;font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:600;}
+  .b-green{background:rgba(111,207,151,0.1);color:var(--green);border:1px solid rgba(111,207,151,0.25);}
+  .b-yellow{background:rgba(242,201,76,0.1);color:var(--yellow);border:1px solid rgba(242,201,76,0.25);}
+  .b-blue{background:rgba(86,204,242,0.1);color:var(--blue);border:1px solid rgba(86,204,242,0.25);}
+  .b-red{background:rgba(235,87,87,0.1);color:var(--red);border:1px solid rgba(235,87,87,0.25);}
+  .b-purple{background:rgba(187,135,252,0.1);color:var(--purple);border:1px solid rgba(187,135,252,0.25);}
+
+  /* SECTION */
+  .section{margin-bottom:48px;}
+  .section-title{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);
+    font-family:'JetBrains Mono',monospace;margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* FOLDER TREE */
+  .tree{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+  .tree-header{padding:14px 20px;background:rgba(111,207,151,0.06);border-bottom:1px solid var(--border);
+    font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--green);}
+  .tree-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2;}
+
+  .f-root{color:var(--green);font-weight:600;}
+  .f-dir{color:var(--yellow);}
+  .f-file{color:var(--text);}
+  .f-comment{color:var(--muted);font-size:11px;}
+  .indent1{padding-left:20px;}
+  .indent2{padding-left:40px;}
+  .indent3{padding-left:60px;}
+  .indent4{padding-left:80px;}
+
+  /* CARDS GRID */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .cards-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;
+    transition:border-color 0.2s;}
+  .card:hover{border-color:rgba(111,207,151,0.3);}
+  .card-icon{font-size:24px;margin-bottom:10px;}
+  .card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;}
+  .card-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+  .card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
+  .tag{font-size:10px;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:10px;
+    background:rgba(111,207,151,0.08);color:var(--green);border:1px solid rgba(111,207,151,0.15);}
+  .tag.y{background:rgba(242,201,76,0.08);color:var(--yellow);border-color:rgba(242,201,76,0.15);}
+  .tag.b{background:rgba(86,204,242,0.08);color:var(--blue);border-color:rgba(86,204,242,0.15);}
+  .tag.r{background:rgba(235,87,87,0.08);color:var(--red);border-color:rgba(235,87,87,0.15);}
+
+  /* API TABLE */
+  .api-table{width:100%;border-collapse:collapse;}
+  .api-table th{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);
+    padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);
+    font-family:'JetBrains Mono',monospace;}
+  .api-table td{padding:11px 14px;font-size:13px;border-bottom:1px solid rgba(111,207,151,0.05);}
+  .api-table tr:hover td{background:rgba(111,207,151,0.03);}
+  
+  .method{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;}
+  .m-get{background:rgba(111,207,151,0.15);color:var(--green);}
+  .m-post{background:rgba(242,201,76,0.15);color:var(--yellow);}
+  .m-put{background:rgba(86,204,242,0.15);color:var(--blue);}
+  .m-del{background:rgba(235,87,87,0.15);color:var(--red);}
+
+  .route{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);}
+  .desc-cell{font-size:12px;color:var(--muted);}
+  .auth-cell{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--purple);}
+
+  /* COMMANDS */
+  .cmd-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+  .cmd-label{padding:8px 16px;background:rgba(111,207,151,0.05);border-bottom:1px solid var(--border);
+    font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+  .cmd-body{padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--green);line-height:2;}
+  .cmd-comment{color:var(--muted);font-size:11px;}
+
+  /* SCHEMA */
+  .schema-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .schema-card{background:var(--surface);border:1px solid rgba(86,204,242,0.15);border-radius:12px;padding:16px;}
+  .schema-name{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--blue);margin-bottom:10px;}
+  .schema-field{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:2px 0;
+    display:flex;gap:8px;}
+  .field-key{color:var(--text);}
+  .field-type{color:var(--purple);}
+  .field-note{color:var(--muted);font-size:10px;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+  .section{animation:fadeUp 0.4s ease both;}
+  .section:nth-child(1){animation-delay:0.05s;} .section:nth-child(2){animation-delay:0.1s;}
+  .section:nth-child(3){animation-delay:0.15s;} .section:nth-child(4){animation-delay:0.2s;}
+  .section:nth-child(5){animation-delay:0.25s;} .section:nth-child(6){animation-delay:0.3s;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="header">
+  <h1>🌱 E-FARM</h1>
+  <p>SMART AGRICULTURE MANAGEMENT SYSTEM · PROJECT DOCUMENTATION</p>
+  <div class="stack-badges">
+    <span class="badge b-green">⚛️ React 18</span>
+    <span class="badge b-yellow">🟨 Node.js 20</span>
+    <span class="badge b-yellow">🚂 Express 4</span>
+    <span class="badge b-green">🍃 MongoDB 7</span>
+    <span class="badge b-red">⚡ Redis 7</span>
+    <span class="badge b-blue">🔌 Socket.IO 4</span>
+    <span class="badge b-purple">🛡️ JWT Auth</span>
+  </div>
+</div>
+
+<!-- SECTION 1: FOLDER STRUCTURE -->
+<div class="section">
+  <div class="section-title">① Complete Folder Structure</div>
+  <div class="cards-2" style="margin-bottom:16px;">
+
+    <!-- FRONTEND TREE -->
+    <div class="tree">
+      <div class="tree-header">📁 efarm-frontend/</div>
+      <div class="tree-body">
+        <div><span class="f-dir">public/</span></div>
+        <div class="indent1"><span class="f-file">index.html</span></div>
+        <div><span class="f-dir">src/</span></div>
+        <div class="indent1"><span class="f-dir">components/</span> <span class="f-comment">// Shared UI components</span></div>
+        <div class="indent2"><span class="f-file">Sidebar.jsx</span></div>
+        <div class="indent2"><span class="f-file">TopBar.jsx</span></div>
+        <div class="indent2"><span class="f-file">StatCard.jsx</span></div>
+        <div class="indent2"><span class="f-file">DataTable.jsx</span></div>
+        <div class="indent2"><span class="f-file">AlertItem.jsx</span></div>
+        <div class="indent2"><span class="f-file">ProgressBar.jsx</span></div>
+        <div class="indent2"><span class="f-file">Modal.jsx</span></div>
+        <div class="indent1"><span class="f-dir">pages/</span> <span class="f-comment">// Each module = one page</span></div>
+        <div class="indent2"><span class="f-file">Dashboard.jsx</span></div>
+        <div class="indent2"><span class="f-file">FarmerPage.jsx</span></div>
+        <div class="indent2"><span class="f-file">CropsPage.jsx</span></div>
+        <div class="indent2"><span class="f-file">MarketPage.jsx</span></div>
+        <div class="indent2"><span class="f-file">WeatherPage.jsx</span></div>
+        <div class="indent2"><span class="f-file">SchemesPage.jsx</span></div>
+        <div class="indent2"><span class="f-file">AnalyticsPage.jsx</span></div>
+        <div class="indent2"><span class="f-file">AdminPage.jsx</span></div>
+        <div class="indent2"><span class="f-file">LoginPage.jsx</span></div>
+        <div class="indent1"><span class="f-dir">services/</span> <span class="f-comment">// API calls</span></div>
+        <div class="indent2"><span class="f-file">api.js</span> <span class="f-comment">// Axios instance</span></div>
+        <div class="indent2"><span class="f-file">socket.js</span> <span class="f-comment">// Socket.IO client</span></div>
+        <div class="indent1"><span class="f-dir">store/</span> <span class="f-comment">// Redux Toolkit</span></div>
+        <div class="indent2"><span class="f-file">store.js</span></div>
+        <div class="indent2"><span class="f-file">authSlice.js</span></div>
+        <div class="indent2"><span class="f-file">cropSlice.js</span></div>
+        <div class="indent2"><span class="f-file">marketSlice.js</span></div>
+        <div class="indent1"><span class="f-dir">hooks/</span></div>
+        <div class="indent2"><span class="f-file">useAuth.js</span></div>
+        <div class="indent2"><span class="f-file">useCrops.js</span></div>
+        <div class="indent2"><span class="f-file">useWeather.js</span></div>
+        <div class="indent1"><span class="f-dir">utils/</span></div>
+        <div class="indent2"><span class="f-file">formatCurrency.js</span></div>
+        <div class="indent2"><span class="f-file">dateHelpers.js</span></div>
+        <div class="indent1"><span class="f-file">App.jsx</span></div>
+        <div class="indent1"><span class="f-file">index.js</span></div>
+        <div><span class="f-file">package.json</span></div>
+        <div><span class="f-file">.env</span></div>
+      </div>
+    </div>
+
+    <!-- BACKEND TREE -->
+    <div class="tree">
+      <div class="tree-header">📁 efarm-backend/</div>
+      <div class="tree-body">
+        <div><span class="f-dir">config/</span></div>
+        <div class="indent1"><span class="f-file">db.js</span> <span class="f-comment">// MongoDB connection</span></div>
+        <div class="indent1"><span class="f-file">cloudinary.js</span></div>
+        <div class="indent1"><span class="f-file">redis.js</span></div>
+        <div><span class="f-dir">models/</span></div>
+        <div class="indent1"><span class="f-file">Farmer.js</span></div>
+        <div class="indent1"><span class="f-file">Crop.js</span></div>
+        <div class="indent1"><span class="f-file">Listing.js</span></div>
+        <div class="indent1"><span class="f-file">Order.js</span></div>
+        <div class="indent1"><span class="f-file">Scheme.js</span></div>
+        <div class="indent1"><span class="f-file">Alert.js</span></div>
+        <div class="indent1"><span class="f-file">MarketPrice.js</span></div>
+        <div><span class="f-dir">controllers/</span></div>
+        <div class="indent1"><span class="f-file">authController.js</span></div>
+        <div class="indent1"><span class="f-file">farmerController.js</span></div>
+        <div class="indent1"><span class="f-file">cropController.js</span></div>
+        <div class="indent1"><span class="f-file">marketController.js</span></div>
+        <div class="indent1"><span class="f-file">weatherController.js</span></div>
+        <div class="indent1"><span class="f-file">schemeController.js</span></div>
+        <div class="indent1"><span class="f-file">adminController.js</span></div>
+        <div><span class="f-dir">routes/</span></div>
+        <div class="indent1"><span class="f-file">authRoutes.js</span></div>
+        <div class="indent1"><span class="f-file">farmerRoutes.js</span></div>
+        <div class="indent1"><span class="f-file">cropRoutes.js</span></div>
+        <div class="indent1"><span class="f-file">marketRoutes.js</span></div>
+        <div class="indent1"><span class="f-file">weatherRoutes.js</span></div>
+        <div class="indent1"><span class="f-file">schemeRoutes.js</span></div>
+        <div class="indent1"><span class="f-file">adminRoutes.js</span></div>
+        <div><span class="f-dir">middleware/</span></div>
+        <div class="indent1"><span class="f-file">auth.js</span> <span class="f-comment">// JWT protect + role guard</span></div>
+        <div class="indent1"><span class="f-file">upload.js</span> <span class="f-comment">// Multer + Cloudinary</span></div>
+        <div class="indent1"><span class="f-file">errorHandler.js</span></div>
+        <div><span class="f-dir">utils/</span></div>
+        <div class="indent1"><span class="f-file">sendSMS.js</span> <span class="f-comment">// Twilio</span></div>
+        <div class="indent1"><span class="f-file">sendEmail.js</span> <span class="f-comment">// Nodemailer</span></div>
+        <div class="indent1"><span class="f-file">generateInvoice.js</span></div>
+        <div><span class="f-file">server.js</span> <span class="f-comment">// Entry point</span></div>
+        <div><span class="f-file">seed.js</span> <span class="f-comment">// Sample data seeder</span></div>
+        <div><span class="f-file">package.json</span></div>
+        <div><span class="f-file">.env</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SECTION 2: MODULES -->
+<div class="section">
+  <div class="section-title">② Core Modules & Responsibilities</div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">👨‍🌾</div>
+      <div class="card-title">Farmer Module</div>
+      <div class="card-desc">Registration, login, profile management, land & crop details, crop calendar, and KCC management.</div>
+      <div class="card-tags"><span class="tag">Register/Login</span><span class="tag">Profile CRUD</span><span class="tag">Crop Calendar</span><span class="tag">KCC</span></div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌾</div>
+      <div class="card-title">Crop Management</div>
+      <div class="card-desc">Full lifecycle tracking from sowing to harvest. Fertilizer/pesticide schedule, disease advisory and yield estimation.</div>
+      <div class="card-tags"><span class="tag">Lifecycle</span><span class="tag">Schedules</span><span class="tag">Disease AI</span><span class="tag">Yield Est.</span></div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🛒</div>
+      <div class="card-title">Market & E-Commerce</div>
+      <div class="card-desc">Direct crop selling bypassing middlemen. Real-time prices via WebSocket, order management, and Razorpay payments.</div>
+      <div class="card-tags"><span class="tag y">Listings</span><span class="tag y">Orders</span><span class="tag y">Razorpay</span><span class="tag y">Invoices</span></div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌤</div>
+      <div class="card-title">Weather & Alerts</div>
+      <div class="card-desc">OpenWeather API integration for 7-day forecasts, rainfall alerts, and AI-powered crop advisory based on conditions.</div>
+      <div class="card-tags"><span class="tag b">OpenWeather</span><span class="tag b">Alerts</span><span class="tag b">Advisory</span></div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <div class="card-title">Schemes & Subsidies</div>
+      <div class="card-desc">Browse government schemes, check eligibility, apply online with status tracking. Includes PM-KISAN, Sinchai Yojana and more.</div>
+      <div class="card-tags"><span class="tag">Eligibility</span><span class="tag">Apply</span><span class="tag">Status</span></div>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚙️</div>
+      <div class="card-title">Admin Panel</div>
+      <div class="card-desc">Full control over farmers, buyers, and transactions. Approve listings, generate reports, manage subsidies.</div>
+      <div class="card-tags"><span class="tag r">Users</span><span class="tag r">Reports</span><span class="tag r">Analytics</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: API ENDPOINTS -->
+<div class="section">
+  <div class="section-title">③ REST API Endpoints</div>
+  <div class="tree">
+    <div class="tree-header">🔌 API Reference — Base URL: /api</div>
+    <div style="overflow-x:auto;">
+      <table class="api-table">
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>Description</th><th>Auth</th></tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="4" style="padding:8px 14px;font-size:10px;letter-spacing:2px;color:#6fcf97;font-family:'JetBrains Mono',monospace;background:rgba(111,207,151,0.04);">AUTH</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="route">/auth/register</td><td class="desc-cell">Register new farmer/buyer</td><td class="auth-cell">Public</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="route">/auth/login</td><td class="desc-cell">Login and get JWT token</td><td class="auth-cell">Public</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/auth/me</td><td class="desc-cell">Get current user profile</td><td class="auth-cell">🔐 JWT</td></tr>
+
+          <tr><td colspan="4" style="padding:8px 14px;font-size:10px;letter-spacing:2px;color:#6fcf97;font-family:'JetBrains Mono',monospace;background:rgba(111,207,151,0.04);">FARMERS</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/farmers</td><td class="desc-cell">List all farmers (with filters)</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/farmers/:id</td><td class="desc-cell">Get single farmer profile</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-put">PUT</span></td><td class="route">/farmers/:id</td><td class="desc-cell">Update farmer profile</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-del">DEL</span></td><td class="route">/farmers/:id</td><td class="desc-cell">Remove farmer (admin only)</td><td class="auth-cell">🔐 Admin</td></tr>
+
+          <tr><td colspan="4" style="padding:8px 14px;font-size:10px;letter-spacing:2px;color:#6fcf97;font-family:'JetBrains Mono',monospace;background:rgba(111,207,151,0.04);">CROPS</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/crops</td><td class="desc-cell">Get farmer's own crops</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="route">/crops</td><td class="desc-cell">Add new crop</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-put">PUT</span></td><td class="route">/crops/:id</td><td class="desc-cell">Update crop stage/progress</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/crops/:id/advisory</td><td class="desc-cell">Get AI disease advisory</td><td class="auth-cell">🔐 JWT</td></tr>
+
+          <tr><td colspan="4" style="padding:8px 14px;font-size:10px;letter-spacing:2px;color:#6fcf97;font-family:'JetBrains Mono',monospace;background:rgba(111,207,151,0.04);">MARKET</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/market/listings</td><td class="desc-cell">Browse crop listings</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="route">/market/listings</td><td class="desc-cell">Create new listing</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="route">/market/orders</td><td class="desc-cell">Place a buy order</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/market/orders</td><td class="desc-cell">Get buyer's order history</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/market/prices</td><td class="desc-cell">Live market prices</td><td class="auth-cell">🔐 JWT</td></tr>
+
+          <tr><td colspan="4" style="padding:8px 14px;font-size:10px;letter-spacing:2px;color:#6fcf97;font-family:'JetBrains Mono',monospace;background:rgba(111,207,151,0.04);">WEATHER · SCHEMES · ADMIN</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/weather</td><td class="desc-cell">7-day forecast by lat/lon</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/weather/alerts</td><td class="desc-cell">Active weather alerts</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/schemes</td><td class="desc-cell">All government schemes</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="route">/schemes/:id/apply</td><td class="desc-cell">Apply for scheme</td><td class="auth-cell">🔐 JWT</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/admin/dashboard</td><td class="desc-cell">Admin stats overview</td><td class="auth-cell">🔐 Admin</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="route">/admin/reports/sales</td><td class="desc-cell">Monthly sales report</td><td class="auth-cell">🔐 Admin</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: DATABASE SCHEMAS -->
+<div class="section">
+  <div class="section-title">④ MongoDB Schema Reference</div>
+  <div class="schema-wrap">
+    <div class="schema-card">
+      <div class="schema-name">👤 farmers</div>
+      <div class="schema-field"><span class="field-key">_id</span><span class="field-type">ObjectId</span></div>
+      <div class="schema-field"><span class="field-key">name</span><span class="field-type">String</span><span class="field-note">required</span></div>
+      <div class="schema-field"><span class="field-key">phone</span><span class="field-type">String</span><span class="field-note">unique</span></div>
+      <div class="schema-field"><span class="field-key">email</span><span class="field-type">String</span></div>
+      <div class="schema-field"><span class="field-key">password</span><span class="field-type">String</span><span class="field-note">hashed</span></div>
+      <div class="schema-field"><span class="field-key">role</span><span class="field-type">Enum</span><span class="field-note">farmer|buyer|admin</span></div>
+      <div class="schema-field"><span class="field-key">location</span><span class="field-type">Object</span></div>
+      <div class="schema-field"><span class="field-key">landSize</span><span class="field-type">Number</span><span class="field-note">acres</span></div>
+      <div class="schema-field"><span class="field-key">bankDetails</span><span class="field-type">Object</span></div>
+      <div class="schema-field"><span class="field-key">isVerified</span><span class="field-type">Boolean</span></div>
+    </div>
+    <div class="schema-card">
+      <div class="schema-name">🌾 crops</div>
+      <div class="schema-field"><span class="field-key">_id</span><span class="field-type">ObjectId</span></div>
+      <div class="schema-field"><span class="field-key">farmerId</span><span class="field-type">Ref:Farmer</span></div>
+      <div class="schema-field"><span class="field-key">cropType</span><span class="field-type">String</span></div>
+      <div class="schema-field"><span class="field-key">area</span><span class="field-type">Number</span><span class="field-note">acres</span></div>
+      <div class="schema-field"><span class="field-key">stage</span><span class="field-type">Enum</span><span class="field-note">5 stages</span></div>
+      <div class="schema-field"><span class="field-key">progress</span><span class="field-type">Number</span><span class="field-note">0-100</span></div>
+      <div class="schema-field"><span class="field-key">sowDate</span><span class="field-type">Date</span></div>
+      <div class="schema-field"><span class="field-key">harvestDate</span><span class="field-type">Date</span></div>
+      <div class="schema-field"><span class="field-key">fertilizerSchedule</span><span class="field-type">Array</span></div>
+      <div class="schema-field"><span class="field-key">diseaseAlerts</span><span class="field-type">Array</span></div>
+    </div>
+    <div class="schema-card">
+      <div class="schema-name">📦 listings</div>
+      <div class="schema-field"><span class="field-key">_id</span><span class="field-type">ObjectId</span></div>
+      <div class="schema-field"><span class="field-key">farmerId</span><span class="field-type">Ref:Farmer</span></div>
+      <div class="schema-field"><span class="field-key">cropType</span><span class="field-type">String</span></div>
+      <div class="schema-field"><span class="field-key">quantity</span><span class="field-type">Number</span><span class="field-note">qtl</span></div>
+      <div class="schema-field"><span class="field-key">pricePerQtl</span><span class="field-type">Number</span><span class="field-note">₹</span></div>
+      <div class="schema-field"><span class="field-key">grade</span><span class="field-type">Enum</span><span class="field-note">A|B|C</span></div>
+      <div class="schema-field"><span class="field-key">isActive</span><span class="field-type">Boolean</span></div>
+      <div class="schema-field"><span class="field-key">views</span><span class="field-type">Number</span></div>
+      <div class="schema-field"><span class="field-key">availableFrom</span><span class="field-type">Date</span></div>
+    </div>
+    <div class="schema-card">
+      <div class="schema-name">🛒 orders</div>
+      <div class="schema-field"><span class="field-key">_id</span><span class="field-type">ObjectId</span></div>
+      <div class="schema-field"><span class="field-key">listingId</span><span class="field-type">Ref:Listing</span></div>
+      <div class="schema-field"><span class="field-key">buyerId</span><span class="field-type">Ref:Farmer</span></div>
+      <div class="schema-field"><span class="field-key">farmerId</span><span class="field-type">Ref:Farmer</span></div>
+      <div class="schema-field"><span class="field-key">quantity</span><span class="field-type">Number</span></div>
+      <div class="schema-field"><span class="field-key">totalAmount</span><span class="field-type">Number</span><span class="field-note">₹</span></div>
+      <div class="schema-field"><span class="field-key">status</span><span class="field-type">Enum</span><span class="field-note">5 states</span></div>
+      <div class="schema-field"><span class="field-key">payment</span><span class="field-type">Object</span><span class="field-note">Razorpay</span></div>
+      <div class="schema-field"><span class="field-key">invoiceUrl</span><span class="field-type">String</span></div>
+    </div>
+    <div class="schema-card">
+      <div class="schema-name">📋 schemes</div>
+      <div class="schema-field"><span class="field-key">_id</span><span class="field-type">ObjectId</span></div>
+      <div class="schema-field"><span class="field-key">name</span><span class="field-type">String</span></div>
+      <div class="schema-field"><span class="field-key">amount</span><span class="field-type">String</span></div>
+      <div class="schema-field"><span class="field-key">deadline</span><span class="field-type">Date</span></div>
+      <div class="schema-field"><span class="field-key">eligibility</span><span class="field-type">Object</span></div>
+      <div class="schema-field"><span class="field-key">→ maxLandAcres</span><span class="field-type">Number</span></div>
+      <div class="schema-field"><span class="field-key">→ maxIncome</span><span class="field-type">Number</span></div>
+      <div class="schema-field"><span class="field-key">applications</span><span class="field-type">Array</span></div>
+      <div class="schema-field"><span class="field-key">isActive</span><span class="field-type">Boolean</span></div>
+    </div>
+    <div class="schema-card">
+      <div class="schema-name">⚠️ alerts + 💰 prices</div>
+      <div class="schema-name" style="margin-top:8px;font-size:11px;color:#7a9e84;">alerts</div>
+      <div class="schema-field"><span class="field-key">type</span><span class="field-type">Enum</span><span class="field-note">weather|pest|market</span></div>
+      <div class="schema-field"><span class="field-key">severity</span><span class="field-type">Enum</span></div>
+      <div class="schema-field"><span class="field-key">region</span><span class="field-type">String</span></div>
+      <div class="schema-field"><span class="field-key">expiresAt</span><span class="field-type">Date</span></div>
+      <div class="schema-name" style="margin-top:10px;font-size:11px;color:#7a9e84;">market_prices</div>
+      <div class="schema-field"><span class="field-key">cropType</span><span class="field-type">String</span></div>
+      <div class="schema-field"><span class="field-key">modalPrice</span><span class="field-type">Number</span></div>
+      <div class="schema-field"><span class="field-key">market, state</span><span class="field-type">String</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5: SETUP COMMANDS -->
+<div class="section">
+  <div class="section-title">⑤ Setup & Run Commands</div>
+  <div class="cards-2">
+    <div>
+      <div class="cmd-box">
+        <div class="cmd-label">Backend Setup</div>
+        <div class="cmd-body">
+          <div class="cmd-comment"># 1. Install backend dependencies</div>
+          cd efarm-backend<br/>
+          npm install<br/><br/>
+          <div class="cmd-comment"># 2. Copy and configure environment</div>
+          cp .env.example .env<br/><br/>
+          <div class="cmd-comment"># 3. Seed sample data</div>
+          npm run seed<br/><br/>
+          <div class="cmd-comment"># 4. Start development server</div>
+          npm run dev<br/><br/>
+          <div class="cmd-comment"># Server runs on http://localhost:5000</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="cmd-box">
+        <div class="cmd-label">Frontend Setup</div>
+        <div class="cmd-body">
+          <div class="cmd-comment"># 1. Install frontend dependencies</div>
+          cd efarm-frontend<br/>
+          npm install<br/><br/>
+          <div class="cmd-comment"># 2. Set API URL in .env</div>
+          echo "REACT_APP_API_URL=http://localhost:5000/api" > .env<br/><br/>
+          <div class="cmd-comment"># 3. Start development server</div>
+          npm start<br/><br/>
+          <div class="cmd-comment"># App runs on http://localhost:3000</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cmd-box">
+    <div class="cmd-label">Production Build</div>
+    <div class="cmd-body" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <div class="cmd-comment"># Build frontend for production</div>
+        cd efarm-frontend && npm run build<br/>
+        <div class="cmd-comment"># Serve with nginx or serve package</div>
+        npx serve -s build -l 3000
+      </div>
+      <div>
+        <div class="cmd-comment"># Run backend in production</div>
+        cd efarm-backend<br/>
+        NODE_ENV=production npm start<br/>
+        <div class="cmd-comment"># Or use PM2 for process management</div>
+        pm2 start server.js --name efarm-api
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6: EXTERNAL INTEGRATIONS -->
+<div class="section">
+  <div class="section-title">⑥ External Integrations & APIs</div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🌦</div>
+      <div class="card-title">OpenWeather API</div>
+      <div class="card-desc">Free tier provides 7-day forecasts, hourly data, and current conditions. Used for weather page and crop advisory system.</div>
+      <div class="card-tags"><span class="tag b">openweathermap.org</span><span class="tag b">Free Tier</span></div>
+    </div>
+    <div class="card">
+      <div class="card-icon">💳</div>
+      <div class="card-title">Razorpay Payments</div>
+      <div class="card-desc">Indian payment gateway supporting UPI, Net Banking, Cards. Handles all crop order payments with webhook confirmation.</div>
+      <div class="card-tags"><span class="tag y">razorpay.com</span><span class="tag y">UPI · Cards</span></div>
+    </div>
+    <div class="card">
+      <div class="card-icon">☁️</div>
+      <div class="card-title">Cloudinary</div>
+      <div class="card-desc">Cloud image storage for crop photos, farmer profile pictures, document uploads, and invoice PDFs.</div>
+      <div class="card-tags"><span class="tag">cloudinary.com</span><span class="tag">Free 25GB</span></div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📱</div>
+      <div class="card-title">Twilio SMS</div>
+      <div class="card-desc">OTP verification for farmer registration, weather alert SMS, and order status notifications via SMS.</div>
+      <div class="card-tags"><span class="tag r">twilio.com</span><span class="tag r">OTP · Alerts</span></div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <div class="card-title">Agmarknet API</div>
+      <div class="card-desc">Government of India agricultural market price feed. Provides live mandi prices for all crop types across states.</div>
+      <div class="card-tags"><span class="tag">agmarknet.gov.in</span><span class="tag">Live Prices</span></div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗺</div>
+      <div class="card-title">Google Maps API</div>
+      <div class="card-desc">Farmer location mapping, nearby market distance calculation, and delivery route estimation.</div>
+      <div class="card-tags"><span class="tag b">Google Cloud</span><span class="tag b">Maps · Geocoding</span></div>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

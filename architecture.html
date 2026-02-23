@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>E-FARM Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0a0f0d;
+    --surface: #111a15;
+    --border: rgba(134,197,108,0.15);
+    --green: #86c56c;
+    --green-dim: rgba(134,197,108,0.08);
+    --yellow: #e8c547;
+    --blue: #6cb8c5;
+    --red: #c5856c;
+    --text: #e8f5e4;
+    --muted: rgba(232,245,228,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; padding: 40px 24px; }
+
+  h1 { text-align: center; font-size: 32px; font-weight: 800; color: var(--green); letter-spacing: 2px; margin-bottom: 4px; }
+  .subtitle { text-align: center; font-size: 13px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 48px; letter-spacing: 3px; }
+
+  .arch { max-width: 1100px; margin: 0 auto; }
+
+  /* LAYER */
+  .layer { margin-bottom: 24px; }
+  .layer-label {
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--muted); font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 10px; padding-left: 4px;
+  }
+
+  .layer-row { display: flex; gap: 12px; align-items: stretch; }
+
+  /* BOX */
+  .box {
+    border-radius: 14px;
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+    background: var(--green-dim);
+    flex: 1;
+    position: relative;
+    transition: all 0.25s;
+    cursor: default;
+  }
+  .box:hover { border-color: var(--green); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(134,197,108,0.12); }
+
+  .box.yellow { background: rgba(232,197,71,0.06); border-color: rgba(232,197,71,0.15); }
+  .box.yellow:hover { border-color: var(--yellow); box-shadow: 0 8px 32px rgba(232,197,71,0.12); }
+
+  .box.blue { background: rgba(108,184,197,0.06); border-color: rgba(108,184,197,0.15); }
+  .box.blue:hover { border-color: var(--blue); box-shadow: 0 8px 32px rgba(108,184,197,0.12); }
+
+  .box.red { background: rgba(197,133,108,0.06); border-color: rgba(197,133,108,0.15); }
+  .box.red:hover { border-color: var(--red); box-shadow: 0 8px 32px rgba(197,133,108,0.12); }
+
+  .box-icon { font-size: 24px; margin-bottom: 8px; }
+  .box-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .box-tech { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--green); margin-bottom: 10px; }
+  .box.yellow .box-tech { color: var(--yellow); }
+  .box.blue .box-tech { color: var(--blue); }
+  .box.red .box-tech { color: var(--red); }
+
+  .tag-list { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag {
+    font-size: 10px; font-family: 'JetBrains Mono', monospace;
+    padding: 2px 7px; border-radius: 20px;
+    background: rgba(134,197,108,0.1); color: var(--green);
+    border: 1px solid rgba(134,197,108,0.2);
+  }
+  .box.yellow .tag { background: rgba(232,197,71,0.1); color: var(--yellow); border-color: rgba(232,197,71,0.2); }
+  .box.blue .tag { background: rgba(108,184,197,0.1); color: var(--blue); border-color: rgba(108,184,197,0.2); }
+  .box.red .tag { background: rgba(197,133,108,0.1); color: var(--red); border-color: rgba(197,133,108,0.2); }
+
+  /* ARROWS */
+  .arrow-row {
+    display: flex; justify-content: center; align-items: center;
+    gap: 8px; margin: 4px 0; height: 36px;
+  }
+  .arrow { text-align: center; color: var(--muted); font-size: 20px; flex: 1; }
+  .arrow-label { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--muted); text-align: center; }
+
+  .connector {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    flex: 1;
+  }
+  .conn-line {
+    width: 1px; height: 20px;
+    background: linear-gradient(180deg, rgba(134,197,108,0.5), rgba(134,197,108,0.1));
+  }
+  .conn-text { font-size: 9px; color: var(--muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; }
+
+  /* CENTER BADGE */
+  .center-box {
+    text-align: center;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, rgba(134,197,108,0.15), rgba(232,197,71,0.08));
+    border: 1px solid rgba(134,197,108,0.3);
+    border-radius: 50px;
+    display: inline-flex; align-items: center; gap: 10px;
+    margin: 0 auto; position: relative; left: 50%; transform: translateX(-50%);
+  }
+  .center-box-text { font-size: 12px; font-weight: 700; color: var(--green); letter-spacing: 2px; }
+
+  /* FLOW DIAGRAM */
+  .flow { margin-top: 40px; }
+  .flow-title { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-bottom: 20px; }
+
+  .flow-steps { display: flex; align-items: center; gap: 0; overflow-x: auto; padding-bottom: 10px; }
+  .flow-step {
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-align: center;
+    width: 130px;
+  }
+  .flow-step-icon { font-size: 22px; margin-bottom: 6px; }
+  .flow-step-name { font-size: 11px; font-weight: 700; color: var(--text); }
+  .flow-step-sub { font-size: 9px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 3px; }
+
+  .flow-arrow {
+    width: 40px; flex-shrink: 0; text-align: center;
+    font-size: 18px; color: var(--green); opacity: 0.5;
+  }
+
+  /* TECH STACK LEGEND */
+  .legend { margin-top: 40px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .legend-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--muted);
+  }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* MONGODB SCHEMA SECTION */
+  .schema-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
+  .schema-box {
+    background: rgba(108,184,197,0.05); border: 1px solid rgba(108,184,197,0.15);
+    border-radius: 12px; padding: 14px;
+  }
+  .schema-title { font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+  .schema-field { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; padding: 2px 0; }
+  .schema-field span { color: var(--blue); }
+
+  @keyframes fadeUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  .layer { animation: fadeUp 0.4s ease both; }
+  .layer:nth-child(1) { animation-delay: 0.05s; }
+  .layer:nth-child(2) { animation-delay: 0.1s; }
+  .layer:nth-child(3) { animation-delay: 0.15s; }
+  .layer:nth-child(4) { animation-delay: 0.2s; }
+  .layer:nth-child(5) { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+<h1>🌱 E-FARM</h1>
+<div class="subtitle">SYSTEM ARCHITECTURE · REACT + NODE.JS + MONGODB</div>
+
+<div class="arch">
+
+  <!-- CLIENT LAYER -->
+  <div class="layer">
+    <div class="layer-label">① Client Layer — Browser / Mobile</div>
+    <div class="layer-row">
+      <div class="box">
+        <div class="box-icon">⚛️</div>
+        <div class="box-title">React Frontend</div>
+        <div class="box-tech">react · react-router · axios</div>
+        <div class="tag-list">
+          <span class="tag">Dashboard</span><span class="tag">Farmer Module</span>
+          <span class="tag">Crop Manager</span><span class="tag">Market</span>
+          <span class="tag">Weather</span><span class="tag">Schemes</span>
+          <span class="tag">Analytics</span><span class="tag">Admin Panel</span>
+        </div>
+      </div>
+      <div class="box yellow">
+        <div class="box-icon">🎨</div>
+        <div class="box-title">State Management</div>
+        <div class="box-tech">redux toolkit · react-query</div>
+        <div class="tag-list">
+          <span class="tag">Auth State</span><span class="tag">Crop State</span>
+          <span class="tag">Market State</span><span class="tag">Cache</span>
+          <span class="tag">WebSocket</span>
+        </div>
+      </div>
+      <div class="box yellow">
+        <div class="box-icon">📦</div>
+        <div class="box-title">UI Libraries</div>
+        <div class="box-tech">recharts · react-hook-form</div>
+        <div class="tag-list">
+          <span class="tag">Charts</span><span class="tag">Forms</span>
+          <span class="tag">Tables</span><span class="tag">Maps</span>
+          <span class="tag">Notifications</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARROW -->
+  <div class="arrow-row">
+    <div class="connector"><div class="conn-line"></div><div class="conn-text">HTTPS · REST API · JWT</div><div class="conn-line"></div></div>
+    <div class="connector"><div class="conn-line"></div><div class="conn-text">WebSocket (Live Prices)</div><div class="conn-line"></div></div>
+    <div class="connector"><div class="conn-line"></div><div class="conn-text">Axios Interceptors</div><div class="conn-line"></div></div>
+  </div>
+
+  <!-- API GATEWAY -->
+  <div class="layer">
+    <div class="layer-label">② API Gateway & Security</div>
+    <div class="layer-row">
+      <div class="box red" style="flex:0.5">
+        <div class="box-icon">🔐</div>
+        <div class="box-title">Auth Middleware</div>
+        <div class="box-tech">JWT · bcryptjs · helmet</div>
+        <div class="tag-list">
+          <span class="tag">JWT Verify</span><span class="tag">Role Guard</span>
+          <span class="tag">Rate Limit</span>
+        </div>
+      </div>
+      <div class="box red" style="flex:0.5">
+        <div class="box-icon">🛡️</div>
+        <div class="box-title">Security Layer</div>
+        <div class="box-tech">cors · express-rate-limit</div>
+        <div class="tag-list">
+          <span class="tag">CORS Policy</span><span class="tag">Helmet</span>
+          <span class="tag">XSS Clean</span>
+        </div>
+      </div>
+      <div class="box red">
+        <div class="box-icon">📡</div>
+        <div class="box-title">Express API Router</div>
+        <div class="box-tech">express.js · express-validator</div>
+        <div class="tag-list">
+          <span class="tag">/api/auth</span><span class="tag">/api/farmers</span>
+          <span class="tag">/api/crops</span><span class="tag">/api/market</span>
+          <span class="tag">/api/weather</span><span class="tag">/api/schemes</span>
+          <span class="tag">/api/admin</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARROW -->
+  <div class="arrow-row">
+    <div class="connector"><div class="conn-line"></div><div class="conn-text">Route Handlers · Controllers</div><div class="conn-line"></div></div>
+    <div class="connector"><div class="conn-line"></div><div class="conn-text">Business Logic Layer</div><div class="conn-line"></div></div>
+    <div class="connector"><div class="conn-line"></div><div class="conn-text">Service Functions</div><div class="conn-line"></div></div>
+  </div>
+
+  <!-- BACKEND LAYER -->
+  <div class="layer">
+    <div class="layer-label">③ Backend Services — Node.js / Express</div>
+    <div class="layer-row">
+      <div class="box">
+        <div class="box-icon">👨‍🌾</div>
+        <div class="box-title">Farmer Service</div>
+        <div class="box-tech">farmerController.js</div>
+        <div class="tag-list">
+          <span class="tag">Register</span><span class="tag">Login</span>
+          <span class="tag">Profile CRUD</span><span class="tag">Calendar</span>
+        </div>
+      </div>
+      <div class="box">
+        <div class="box-icon">🌾</div>
+        <div class="box-title">Crop Service</div>
+        <div class="box-tech">cropController.js</div>
+        <div class="tag-list">
+          <span class="tag">Lifecycle</span><span class="tag">Schedule</span>
+          <span class="tag">Disease AI</span><span class="tag">Yield Est.</span>
+        </div>
+      </div>
+      <div class="box">
+        <div class="box-icon">🛒</div>
+        <div class="box-title">Market Service</div>
+        <div class="box-tech">marketController.js</div>
+        <div class="tag-list">
+          <span class="tag">Listings</span><span class="tag">Orders</span>
+          <span class="tag">Payments</span><span class="tag">Invoices</span>
+        </div>
+      </div>
+      <div class="box yellow">
+        <div class="box-icon">🌤</div>
+        <div class="box-title">Weather Service</div>
+        <div class="box-tech">weatherController.js</div>
+        <div class="tag-list">
+          <span class="tag">OpenWeather API</span>
+          <span class="tag">Alerts</span><span class="tag">Advisory</span>
+        </div>
+      </div>
+      <div class="box yellow">
+        <div class="box-icon">📋</div>
+        <div class="box-title">Scheme Service</div>
+        <div class="box-tech">schemeController.js</div>
+        <div class="tag-list">
+          <span class="tag">Eligibility</span>
+          <span class="tag">Apply</span><span class="tag">Status</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARROW -->
+  <div class="arrow-row">
+    <div class="connector"><div class="conn-line"></div><div class="conn-text">Mongoose ODM</div><div class="conn-line"></div></div>
+    <div class="connector"><div class="conn-line"></div><div class="conn-text">Schema Validation</div><div class="conn-line"></div></div>
+    <div class="connector"><div class="conn-line"></div><div class="conn-text">Aggregation Pipelines</div><div class="conn-line"></div></div>
+  </div>
+
+  <!-- DATABASE LAYER -->
+  <div class="layer">
+    <div class="layer-label">④ Database Layer — MongoDB Atlas</div>
+    <div class="layer-row">
+      <div class="box blue" style="flex:2">
+        <div class="box-icon">🍃</div>
+        <div class="box-title">MongoDB Collections</div>
+        <div class="box-tech">mongoose · mongodb atlas</div>
+        <div class="schema-grid">
+          <div class="schema-box">
+            <div class="schema-title">👤 farmers</div>
+            <div class="schema-field"><span>_id</span>, name, phone</div>
+            <div class="schema-field"><span>location</span>, landSize</div>
+            <div class="schema-field"><span>crops[]</span>, bankDetails</div>
+            <div class="schema-field"><span>aadhaar</span>, verified</div>
+          </div>
+          <div class="schema-box">
+            <div class="schema-title">🌾 crops</div>
+            <div class="schema-field"><span>farmerId</span> (ref)</div>
+            <div class="schema-field"><span>type</span>, area, stage</div>
+            <div class="schema-field"><span>sowDate</span>, harvestDate</div>
+            <div class="schema-field"><span>yieldEst</span>, progress</div>
+          </div>
+          <div class="schema-box">
+            <div class="schema-title">🛒 orders</div>
+            <div class="schema-field"><span>farmerId</span>, buyerId</div>
+            <div class="schema-field"><span>cropId</span>, quantity</div>
+            <div class="schema-field"><span>amount</span>, status</div>
+            <div class="schema-field"><span>invoiceUrl</span></div>
+          </div>
+          <div class="schema-box">
+            <div class="schema-title">📦 listings</div>
+            <div class="schema-field"><span>farmerId</span> (ref)</div>
+            <div class="schema-field"><span>cropType</span>, qty</div>
+            <div class="schema-field"><span>price</span>, grade</div>
+            <div class="schema-field"><span>availableFrom</span></div>
+          </div>
+          <div class="schema-box">
+            <div class="schema-title">📋 schemes</div>
+            <div class="schema-field"><span>name</span>, description</div>
+            <div class="schema-field"><span>eligibility{}</span></div>
+            <div class="schema-field"><span>deadline</span>, amount</div>
+            <div class="schema-field"><span>applications[]</span></div>
+          </div>
+          <div class="schema-box">
+            <div class="schema-title">⚠️ alerts</div>
+            <div class="schema-field"><span>type</span>, title</div>
+            <div class="schema-field"><span>region</span>, crop</div>
+            <div class="schema-field"><span>severity</span>, message</div>
+            <div class="schema-field"><span>createdAt</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;flex:0.7">
+        <div class="box blue">
+          <div class="box-icon">⚡</div>
+          <div class="box-title">Redis Cache</div>
+          <div class="box-tech">ioredis · cache-manager</div>
+          <div class="tag-list">
+            <span class="tag">Market Prices</span>
+            <span class="tag">Weather Data</span>
+            <span class="tag">Sessions</span>
+          </div>
+        </div>
+        <div class="box blue">
+          <div class="box-icon">🗄️</div>
+          <div class="box-title">File Storage</div>
+          <div class="box-tech">cloudinary · multer</div>
+          <div class="tag-list">
+            <span class="tag">Crop Photos</span>
+            <span class="tag">Documents</span>
+            <span class="tag">Invoices</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARROW -->
+  <div class="arrow-row">
+    <div class="connector"><div class="conn-line"></div><div class="conn-text">External Integrations</div><div class="conn-line"></div></div>
+  </div>
+
+  <!-- EXTERNAL SERVICES -->
+  <div class="layer">
+    <div class="layer-label">⑤ External Services & Integrations</div>
+    <div class="layer-row">
+      <div class="box yellow">
+        <div class="box-icon">🌦</div>
+        <div class="box-title">OpenWeather API</div>
+        <div class="box-tech">REST · JSON</div>
+        <div class="tag-list"><span class="tag">Forecast</span><span class="tag">Alerts</span></div>
+      </div>
+      <div class="box yellow">
+        <div class="box-icon">💳</div>
+        <div class="box-title">Payment Gateway</div>
+        <div class="box-tech">Razorpay API</div>
+        <div class="tag-list"><span class="tag">UPI</span><span class="tag">Net Banking</span></div>
+      </div>
+      <div class="box yellow">
+        <div class="box-icon">📱</div>
+        <div class="box-title">SMS / Email</div>
+        <div class="box-tech">Twilio · Nodemailer</div>
+        <div class="tag-list"><span class="tag">OTP</span><span class="tag">Alerts</span></div>
+      </div>
+      <div class="box yellow">
+        <div class="box-icon">🗺</div>
+        <div class="box-title">Maps API</div>
+        <div class="box-tech">Google Maps API</div>
+        <div class="tag-list"><span class="tag">Farm Location</span><span class="tag">Market Distance</span></div>
+      </div>
+      <div class="box yellow">
+        <div class="box-icon">📊</div>
+        <div class="box-title">Market Price Feed</div>
+        <div class="box-tech">Agmarknet API</div>
+        <div class="tag-list"><span class="tag">Live Prices</span><span class="tag">Trends</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REQUEST FLOW -->
+  <div class="flow">
+    <div class="flow-title">Request Flow</div>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="flow-step-icon">👤</div><div class="flow-step-name">User Action</div><div class="flow-step-sub">Browser/App</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-step-icon">⚛️</div><div class="flow-step-name">React Component</div><div class="flow-step-sub">Dispatch / Axios</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-step-icon">🔐</div><div class="flow-step-name">Auth Middleware</div><div class="flow-step-sub">JWT Verify</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-step-icon">📡</div><div class="flow-step-name">Express Router</div><div class="flow-step-sub">Route Match</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-step-icon">⚙️</div><div class="flow-step-name">Controller</div><div class="flow-step-sub">Business Logic</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-step-icon">🍃</div><div class="flow-step-name">Mongoose</div><div class="flow-step-sub">DB Query</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-step-icon">💾</div><div class="flow-step-name">MongoDB</div><div class="flow-step-sub">Data Stored</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-step-icon">📤</div><div class="flow-step-name">JSON Response</div><div class="flow-step-sub">HTTP 200</div></div>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#86c56c"></div>Frontend / Green Layer</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e8c547"></div>Backend / API Services</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#6cb8c5"></div>Database / Storage</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#c5856c"></div>Security / Gateway</div>
+    <div class="legend-item" style="margin-left:auto;font-size:11px;">Stack: React 18 · Node 20 · Express 4 · MongoDB 7 · Redis 7</div>
+  </div>
+
+</div>
+</body>
+</html>
